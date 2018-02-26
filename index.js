@@ -56,7 +56,11 @@ class SimpleHttpResponder {
 
     return datastore.save(entity)
       .then(() => {
-        res.status(200).send(OK_JSON)
+
+        res.writeHead(200, {
+          "Content-type": "Application/json"
+        })
+        res.end(OK_JSON)
         return Promise.resolve()
       })
       .catch((err) => {
@@ -72,11 +76,13 @@ class SimpleHttpResponder {
       .filter('lastUpdate', '>', 0)
     datastore.runQuery(query)
       .then(results => {
-        res.status(200).send(JSON.stringify(results[0]))
+        res.writeHead(200, {
+          "Content-type": "Application/json"
+        })
+        res.end(JSON.stringify(results[0]))
         return Promise.resolve()
       })
       .catch(erro => {
-        res.setHeader("Content-type", "Application/json")
         res.status(500).send(erro)
         return Promise.resolve()
       })
