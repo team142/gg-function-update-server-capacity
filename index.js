@@ -19,7 +19,6 @@ exports.handle = (req, res) => {
 }
 
 class SimpleHttpResponder {
-
   static handlePost(req, res) {
     const key = datastore.key(["capacity", req.body.friendlyName])
     const subEntity = [
@@ -56,7 +55,6 @@ class SimpleHttpResponder {
 
     return datastore.save(entity)
       .then(() => {
-
         res.writeHead(200, {
           "Content-type": "Application/json"
         })
@@ -70,10 +68,8 @@ class SimpleHttpResponder {
   }
 
   static handleGet(req, res) {
-    let r = []
     const query = datastore
       .createQuery('capacity')
-      .filter('lastUpdate', '>', 0)
     datastore.runQuery(query)
       .then(results => {
         res.writeHead(200, {
@@ -86,7 +82,6 @@ class SimpleHttpResponder {
         res.status(500).send(erro)
         return Promise.resolve()
       })
-
   }
-
+  
 }
