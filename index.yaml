@@ -1,0 +1,5 @@
+indexes:
+- kind: capacity
+  properties:
+  - name: lastUpdate
+    direction: desc
