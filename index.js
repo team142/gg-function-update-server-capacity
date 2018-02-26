@@ -1,15 +1,22 @@
-'use strict';
+'use strict'
 
-const Datastore = require('@google-cloud/datastore');
-const datastore = Datastore();
-const uuid = require('uuid');
+const Datastore = require('@google-cloud/datastore')
+const datastore = Datastore()
+const uuid = require('uuid')
 
+const OK_JSON = JSON.stringify({
+  ok: true
+})
 
 exports.handle = (req, res) => {
 
-  return SimpleHttpResponder.handlePost(req, res)
-
-};
+  if (req.method == "POST") {
+    return SimpleHttpResponder.handlePost(req, res)
+  }
+  if (req.method == "GET") {
+    return SimpleHttpResponder.handleGet(req, res)
+  }
+}
 
 class SimpleHttpResponder {
 
@@ -40,29 +47,40 @@ class SimpleHttpResponder {
         name: 'lastUpdate',
         value: new Date().getTime(),
       },
-    ];
+    ]
+
     const entity = {
       key: key,
       data: subEntity
-    };
+    }
 
     return datastore.save(entity)
-      .then(() => SimpleHttpResponder.handleSuccess(res))
+      .then(() => {
+        res.status(200).send(OK_JSON)
+        return Promise.resolve()
+      })
       .catch((err) => {
-        SimpleHttpResponder.handleFailure(res, err)
-      });
+        console.error(err)
+        res.status(500).send(err.message)
+      })
   }
 
-  static handleSuccess(res) {
-    res.status(200).send(`Entity saved.`)
-    return Promise.resolve()
-  }
+  static handleGet(req, res) {
+    let r = []
+    const query = datastore
+      .createQuery('capacity')
+      .filter('lastUpdate', '>', 0)
+    datastore.runQuery(query)
+      .then(results => {
+        res.status(200).send(JSON.stringify(results[0]))
+        return Promise.resolve()
+      })
+      .catch(erro => {
+        res.setHeader("Content-type", "Application/json")
+        res.status(500).send(erro)
+        return Promise.resolve()
+      })
 
-  static handleFailure(res, err) {
-    console.error(err)
-    res.status(500).send(err.message)
   }
 
 }
-
-
