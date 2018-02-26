@@ -14,20 +14,33 @@ exports.handle = (req, res) => {
 class SimpleHttpResponder {
 
   static handlePost(req, res) {
-    const key = datastore.key(["capacity", req.body.serverName])
-
-    const subEntity = {
-      capacity: {
-        currentPlayers: req.body.currentPlayers,
-        maxPlayers: req.body.maxPlayers
+    const key = datastore.key(["capacity", req.body.friendlyName])
+    const subEntity = [
+      {
+        name: 'capacity',
+        value: req.body.currentPlayers,
+        excludeFromIndexes: true,
       },
-      details: {
-        hostname: req.body.serverName,
-        joinUrl: req.body.serverName
+      {
+        name: 'maxPlayers',
+        value: req.body.maxPlayers,
+        excludeFromIndexes: true,
       },
-      lastUpdate: new Date().getTime()
-    }
-
+      {
+        name: 'friendlyName',
+        value: req.body.friendlyName,
+        excludeFromIndexes: true,
+      },
+      {
+        name: 'joinUrl',
+        value: req.body.joinUrl,
+        excludeFromIndexes: true,
+      },
+      {
+        name: 'lastUpdate',
+        value: new Date().getTime(),
+      },
+    ];
     const entity = {
       key: key,
       data: subEntity
